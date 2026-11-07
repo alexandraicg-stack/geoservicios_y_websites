@@ -60,3 +60,30 @@ Las capturas documentan el funcionamiento local comprobado durante el desarrollo
 
 ![Ficha interactiva de Anapoima desde GeoServer](evidencias/10_leaflet_consulta_anapoima.png)
 
+
+
+## Evidencias adicionales — versiones 2 y 3
+
+Capturas obtenidas durante la construcción y comprobación del visor; documentan resultados observados en el navegador.
+
+### Versión 2 — estilos transparentes y límites departamentales
+![Versión 2 — estilos transparentes y límites departamentales](evidencias/11_v2_estilos_transparentes.png)
+
+### Versión 2 — búsqueda y selección de Bogotá, D. C.
+![Versión 2 — búsqueda y selección de Bogotá, D. C.](evidencias/12_v2_busqueda_bogota.png)
+
+### Versión 3 — panel con estadísticas nacionales y selector departamental
+![Versión 3 — panel con estadísticas nacionales y selector departamental](evidencias/13_v3_cobertura_nacional.png)
+
+### Versión 3 — filtro Boyacá, 123 registros y selección de Chíquiza
+![Versión 3 — filtro Boyacá, 123 registros y selección de Chíquiza](evidencias/14_v3_boyaca_chiquiza.png)
+
+### Versión 3 — filtro Cundinamarca y selección de Funza
+![Versión 3 — filtro Cundinamarca y selección de Funza](evidencias/15_v3_cundinamarca_funza.png)
+
+### Versión 3 — acercamiento automático al departamento de Boyacá
+![Versión 3 — acercamiento automático al departamento de Boyacá](evidencias/16_v3_zoom_departamental_boyaca.png)
+
+### Versión 3 — vista nacional final y panel de consulta
+![Versión 3 — vista nacional final y panel de consulta](evidencias/17_v3_vista_nacional_final.png)
+
