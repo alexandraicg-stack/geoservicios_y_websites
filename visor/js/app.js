@@ -52,7 +52,17 @@ if (esVisorPublico) {
         onEachFeature: (feature, layer) => {
             layer.on("click", event => {
                 // Evitar el error GetFeatureInfo de localhost en GitHub Pages.
-                mostrarPopupMunicipio(feature, event.latlng);
+                const codigoSeleccionado =
+    document.getElementById("filtro-departamento").value;
+
+const codigoMunicipio =
+    String(feature.properties.divipola_dep || "").padStart(2, "0");
+
+if (codigoSeleccionado && codigoMunicipio !== codigoSeleccionado) {
+    return;
+}
+
+mostrarPopupMunicipio(feature, event.latlng);
             });
         }
     });

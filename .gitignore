@@ -21,3 +21,8 @@ visor/index.respaldo-responsive.html
 visor/css/style.respaldo-responsive.css
 visor/js/app.respaldo-responsive.js
 
+
+# Respaldos adicionales del visor
+visor/js/app.respaldo-antes-publicacion.js
+visor/js/app.respaldo-filtro-v6.js
+
