@@ -1,4 +1,4 @@
-﻿const mapa = L.map("map", {
+const mapa = L.map("map", {
     center: [4.5, -74.5],
     zoom: 6,
     zoomControl: true
@@ -13,40 +13,74 @@ const osm = L.tileLayer(
     }
 ).addTo(mapa);
 
-// Servicios WMS de nuestro GeoServer
+// V5: GeoServer local y GeoJSON público (GitHub Pages).
+// GitHub Pages no puede acceder a GeoServer instalado en otro computador.
+const esVisorPublico = !["localhost", "127.0.0.1"].includes(window.location.hostname);
 const urlWMS = "http://localhost:8082/geoserver/colombia_sig/wms";
+let departamentos;
+let municipios;
 
-// Departamentos
-const departamentos = L.tileLayer.wms(urlWMS, {
-    layers: "colombia_sig:departamentos_colombia",
-    format: "image/png",
-    transparent: true,
-    version: "1.1.1",
-    opacity: 0.65
-}).addTo(mapa);
+function mostrarPopupMunicipio(feature, latlng) {
+    const info = feature.properties || {};
+    const ficha = document.createElement("div");
+    ficha.style.minWidth = "210px";
+    const titulo = document.createElement("strong");
+    titulo.textContent = info.mpio_nombre || "Municipio";
+    ficha.appendChild(titulo);
+    const detalles = [
+        ["Departamento", info.dpto_nombre],
+        ["Código DIVIPOLA", info.divipola_mun],
+        ["Área registrada", info.area_km2 == null ? "Sin dato" :
+            Number(info.area_km2).toLocaleString("es-CO", {maximumFractionDigits: 2}) + " km²"]
+    ];
+    detalles.forEach(([etiqueta, valor]) => {
+        const linea = document.createElement("p");
+        linea.textContent = etiqueta + ": " + (valor ?? "Sin dato");
+        ficha.appendChild(linea);
+    });
+    L.popup().setLatLng(latlng).setContent(ficha).openOn(mapa);
+    mostrarFichaMunicipal(info);
+}
 
-// Municipios
-const municipios = L.tileLayer.wms(urlWMS, {
-    layers: "colombia_sig:Municipios",
-    format: "image/png",
-    transparent: true,
-    version: "1.1.1",
-    opacity: 0.75
-});
+if (esVisorPublico) {
+    // Capas vectoriales; los datos se cargan desde archivos públicos HTTPS.
+    departamentos = L.geoJSON(null, {
+        style: {color: "#214f81", weight: 2, fillOpacity: 0, opacity: 0.85}
+    }).addTo(mapa);
+    municipios = L.geoJSON(null, {
+        style: {color: "#7597b5", weight: 1, fillOpacity: 0, opacity: 0.8},
+        onEachFeature: (feature, layer) => {
+            layer.on("click", event => {
+                // Evitar el error GetFeatureInfo de localhost en GitHub Pages.
+                mostrarPopupMunicipio(feature, event.latlng);
+            });
+        }
+    });
+    fetch("../data/departamentos.geojson")
+        .then(r => {
+            if (!r.ok) throw new Error("Departamentos HTTP " + r.status);
+            return r.json();
+        })
+        .then(datos => {
+            departamentos.addData(datos);
+            console.log("Departamentos públicos cargados:", datos.features.length);
+        })
+        .catch(error => console.error("No se pudieron cargar departamentos:", error));
+} else {
+    departamentos = L.tileLayer.wms(urlWMS, {
+        layers: "colombia_sig:departamentos_colombia",
+        format: "image/png", transparent: true, version: "1.1.1", opacity: 0.65
+    }).addTo(mapa);
+    municipios = L.tileLayer.wms(urlWMS, {
+        layers: "colombia_sig:Municipios",
+        format: "image/png", transparent: true, version: "1.1.1", opacity: 0.75
+    });
+}
 
-// Control de capas
 L.control.layers(
-    {
-        "OpenStreetMap": osm
-    },
-    {
-        "Departamentos": departamentos,
-        "Municipios": municipios
-    },
-    {
-        collapsed: false,
-        position: "topright"
-    }
+    {"OpenStreetMap": osm},
+    {"Departamentos": departamentos, "Municipios": municipios},
+    {collapsed: false, position: "topright"}
 ).addTo(mapa);
 
 // Escala gráfica
@@ -62,6 +96,7 @@ console.log("Visor Territorial de Colombia iniciado");
 
 // CONSULTA MUNICIPAL MEDIANTE WMS GETFEATUREINFO
 mapa.on("click", async function (evento) {
+    if (esVisorPublico) return; // La consulta pública se resuelve sobre los polígonos GeoJSON.
 
     if (!mapa.hasLayer(municipios)) {
         L.popup()
@@ -209,8 +244,8 @@ function mostrarFichaMunicipal(info) {
 
 async function seleccionarMunicipio(feature) {
 
-    // CONSULTAR MUNICIPIO SELECCIONADO MEDIANTE WFS
-    try {
+    // En modo local consumimos WFS; en GitHub Pages usamos el GeoJSON alojado en HTTPS.
+    if (!esVisorPublico) try {
         const codigo = feature.properties.divipola_mun;
 
         const featureWFS = await consultarMunicipioWFS(codigo);
@@ -303,6 +338,10 @@ fetch("../data/municipios_colombia.geojson")
     })
     .then(datos => {
         municipiosBusqueda = datos.features || [];
+        if (esVisorPublico) {
+            municipios.addData(datos);
+            console.log("Municipios públicos cargados:", municipiosBusqueda.length);
+        }
         inicializarFiltroDepartamentos();
 
         console.log(
@@ -516,23 +555,14 @@ leyendaCartografica.onAdd = function () {
 
 leyendaCartografica.addTo(mapa);
 
-// MENU HAMBURGUESA RESPONSIVE V4
+// MENU RESPONSIVE V4: abre y cierra el panel en pantallas pequeñas.
 const botonMenu = document.getElementById("boton-menu");
 const panelTerritorial = document.getElementById("panel-territorial");
-
 if (botonMenu && panelTerritorial) {
-    botonMenu.addEventListener("click", function () {
+    botonMenu.addEventListener("click", () => {
         const abierto = panelTerritorial.classList.toggle("panel-abierto");
-
         botonMenu.setAttribute("aria-expanded", String(abierto));
-        botonMenu.textContent = abierto
-            ? "\u2715 Cerrar consultas"
-            : "\u2630 Consultas";
-
-        if (typeof mapa !== "undefined") {
-            setTimeout(function () {
-                mapa.invalidateSize();
-            }, 150);
-        }
+        botonMenu.textContent = abierto ? "✕ Cerrar consultas" : "☰ Consultas";
+        window.setTimeout(() => mapa.invalidateSize(), 150);
     });
 }
