@@ -45,7 +45,7 @@ function mostrarPopupMunicipio(feature, latlng) {
 if (esVisorPublico) {
     // Capas vectoriales; los datos se cargan desde archivos públicos HTTPS.
     departamentos = L.geoJSON(null, {
-        style: {color: "#214f81", weight: 2, fillOpacity: 0, opacity: 0.85}
+        interactive: false, style: {color: "#214f81", weight: 2, fillOpacity: 0, opacity: 0.85}
     }).addTo(mapa);
     municipios = L.geoJSON(null, {
         style: {color: "#7597b5", weight: 1, fillOpacity: 0, opacity: 0.8},
@@ -576,4 +576,5 @@ if (botonMenu && panelTerritorial) {
         window.setTimeout(() => mapa.invalidateSize(), 150);
     });
 }
+
 

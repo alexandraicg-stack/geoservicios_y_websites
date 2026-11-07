@@ -138,3 +138,35 @@ function agregarBibliotecasALeyenda() {
 }
 
 agregarBibliotecasALeyenda();
+
+// PRIORIDAD DE CONSULTA: BIBLIOTECAS SOBRE MUNICIPIOS
+function priorizarBibliotecasCali() {
+    if (mapa.hasLayer(municipios) && typeof municipios.bringToBack === "function") {
+        municipios.bringToBack();
+    }
+
+    if (mapa.hasLayer(bibliotecasWFS)) {
+        bibliotecasWFS.bringToFront();
+    }
+}
+
+mapa.on("overlayadd", priorizarBibliotecasCali);
+mapa.on("overlayremove", priorizarBibliotecasCali);
+
+priorizarBibliotecasCali();
+
+// PRIORIDAD DE CONSULTA: BIBLIOTECAS SOBRE MUNICIPIOS
+function priorizarBibliotecasCali() {
+    if (mapa.hasLayer(municipios) && typeof municipios.bringToBack === "function") {
+        municipios.bringToBack();
+    }
+
+    if (mapa.hasLayer(bibliotecasWFS)) {
+        bibliotecasWFS.bringToFront();
+    }
+}
+
+mapa.on("overlayadd", priorizarBibliotecasCali);
+mapa.on("overlayremove", priorizarBibliotecasCali);
+
+priorizarBibliotecasCali();
