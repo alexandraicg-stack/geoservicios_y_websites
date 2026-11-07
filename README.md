@@ -97,16 +97,6 @@ Esta vista presenta las rutas relevantes documentadas; no pretende ser un invent
 
 **No necesitas ejecutar Docker para abrir el visor público.** La capa de bibliotecas requiere conexión y disponibilidad del servicio externo de IDESC.
 
-## Capítulo 10 — pygeoapi y servicios OGC API
-
-El **Capítulo 10** aborda **pygeoapi**, un servidor Python para publicar y consultar información geoespacial mediante estándares modernos de **OGC API**. Se documenta como una práctica independiente de la aplicación Leaflet del Capítulo 11.
-
-- **Guía académica:** [Capítulo 10 — pygeoapi (repositorio de epiragauta)](https://github.com/epiragauta/servicios_sig_y_websites/blob/main/taller/capitulo-10-pygeoapi.md).
-- **Proyecto oficial:** [geopython/pygeoapi](https://github.com/geopython/pygeoapi).
-- **Alcance por confirmar:** configuración local, colecciones publicadas, respuestas de la API y capturas de prueba. **La inclusión de esta referencia no significa que pygeoapi ya esté instalado, funcionando o validado en este repositorio.**
-
-Para dar por terminado este capítulo se deberán conservar la configuración utilizada y evidencias reales de los endpoints de la instancia (`/`, `/collections` y, si aplica, `/collections/{collectionId}/items`), sin atribuir resultados que todavía no se hayan probado.
-
 ## Desarrollo y evidencias
 
 El proyecto registra una evolución desde la nivelación con Git y Visual Studio Code hasta la configuración de contenedores, publicación local de datos y construcción del visor web.
