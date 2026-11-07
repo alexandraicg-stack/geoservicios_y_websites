@@ -1,4 +1,4 @@
-// INTEGRACION INSTITUCIONAL WMS/WFS - IDESC CALI
+﻿// INTEGRACION INSTITUCIONAL WMS/WFS - IDESC CALI
 // Fuente: GeoServer de Santiago de Cali
 
 const urlGeoServerCali =
@@ -22,9 +22,9 @@ const bibliotecasWMS = L.tileLayer.wms(
 // Geometrias para consulta mediante WFS
 const bibliotecasWFS = L.geoJSON(null, {
     style: {
-        color: "#a21caf",
-        weight: 3,
-        fillColor: "#e879f9", fillOpacity: 0.45,
+        color: "#4C1D95",
+        weight: 4,
+        fillColor: "#6D28D9", fillOpacity: 0.75,
         opacity: 1
     },
 
@@ -95,16 +95,46 @@ mapa.on("overlayremove", function (evento) {
     }
 });
 
-// Agregar la nueva capa al control existente
-L.control.layers(null, {
-    "Bibliotecas de Cali (WMS/WFS)": bibliotecasWMS
-}, {
-    position: "topright",
-    collapsed: true
-}).addTo(mapa);
+controlCapas.addOverlay(bibliotecasWMS, "Bibliotecas de Cali (WMS/WFS)");
 
 // Descargar entidades WFS
 cargarBibliotecasCali().catch(function (error) {
     console.error("Error cargando bibliotecas de Cali:", error);
 });
 
+
+
+
+
+// LEYENDA INSTITUCIONAL - BIBLIOTECAS DE CALI
+function agregarBibliotecasALeyenda() {
+    const leyenda = document.querySelector(".leyenda-territorial");
+
+    if (!leyenda || document.getElementById("leyenda-bibliotecas-cali")) {
+        return;
+    }
+
+    const fila = document.createElement("div");
+    fila.id = "leyenda-bibliotecas-cali";
+    fila.style.cssText = "display:flex;align-items:center;gap:8px;margin-top:5px;";
+
+    const simbolo = document.createElement("span");
+    simbolo.style.cssText = `
+        display:inline-block;
+        width:24px;
+        height:12px;
+        background:#6D28D9;
+        border:2px solid #4C1D95;
+        border-radius:3px;
+        box-sizing:border-box;
+        flex-shrink:0;
+    `;
+
+    const texto = document.createElement("span");
+    texto.textContent = "Bibliotecas de Cali";
+
+    fila.append(simbolo, texto);
+    leyenda.appendChild(fila);
+}
+
+agregarBibliotecasALeyenda();

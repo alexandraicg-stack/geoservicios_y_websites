@@ -1,4 +1,4 @@
-const mapa = L.map("map", {
+﻿const mapa = L.map("map", {
     center: [4.5, -74.5],
     zoom: 6,
     zoomControl: true
@@ -87,7 +87,7 @@ mostrarPopupMunicipio(feature, event.latlng);
     });
 }
 
-L.control.layers(
+const controlCapas = L.control.layers(
     {"OpenStreetMap": osm},
     {"Departamentos": departamentos, "Municipios": municipios},
     {collapsed: false, position: "topright"}
@@ -576,3 +576,4 @@ if (botonMenu && panelTerritorial) {
         window.setTimeout(() => mapa.invalidateSize(), 150);
     });
 }
+
