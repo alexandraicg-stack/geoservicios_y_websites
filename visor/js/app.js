@@ -242,7 +242,7 @@ function buscarMunicipios() {
     }
 
     const encontrados = municipiosBusqueda
-        .filter(feature =>
+        .filter(feature => (!filtroDepartamento.value || String(feature.properties?.divipola_dep || "").padStart(2, "0") === filtroDepartamento.value) &&
             normalizarTexto(feature.properties?.mpio_nombre).includes(texto)
         )
         .slice(0, 12);
@@ -283,6 +283,7 @@ fetch("../data/municipios_colombia.geojson")
     })
     .then(datos => {
         municipiosBusqueda = datos.features || [];
+        inicializarFiltroDepartamentos();
 
         console.log(
             "Municipios disponibles para búsqueda:",
@@ -295,3 +296,124 @@ fetch("../data/municipios_colombia.geojson")
             "No fue posible cargar el buscador municipal.";
     });
 
+
+
+// FILTRO DEPARTAMENTAL V3
+
+const filtroDepartamento = document.getElementById("filtro-departamento");
+const estadisticas = document.getElementById("estadisticas-territoriales");
+
+function codigoDepartamento(info) {
+    return String(info.divipola_dep || "").padStart(2, "0");
+}
+
+function mostrarEstadisticas() {
+    const codigo = filtroDepartamento.value;
+
+    const seleccion = municipiosBusqueda.filter(feature =>
+        !codigo || codigoDepartamento(feature.properties) === codigo
+    );
+
+    const areaTotal = seleccion.reduce((suma, feature) => {
+        return suma + (Number(feature.properties?.area_km2) || 0);
+    }, 0);
+
+    estadisticas.replaceChildren();
+
+    const titulo = document.createElement("h3");
+    titulo.textContent = codigo
+        ? filtroDepartamento.options[filtroDepartamento.selectedIndex].text
+        : "Cobertura nacional";
+
+    const cantidad = document.createElement("p");
+    cantidad.textContent = "Registros municipales: " + seleccion.length;
+
+    const area = document.createElement("p");
+    area.textContent = "Suma de areas registradas: " +
+        areaTotal.toLocaleString("es-CO", {
+            maximumFractionDigits: 2
+        }) + " km²";
+
+    estadisticas.append(titulo, cantidad, area);
+}
+
+function inicializarFiltroDepartamentos() {
+    const departamentos = new Map();
+
+    municipiosBusqueda.forEach(feature => {
+        const info = feature.properties || {};
+        const codigo = codigoDepartamento(info);
+
+        if (codigo && info.dpto_nombre) {
+            departamentos.set(codigo, info.dpto_nombre);
+        }
+    });
+
+    [...departamentos.entries()]
+        .sort((a, b) => a[1].localeCompare(b[1], "es"))
+        .forEach(([codigo, nombre]) => {
+            const opcion = document.createElement("option");
+            opcion.value = codigo;
+            opcion.textContent = nombre;
+            filtroDepartamento.appendChild(opcion);
+        });
+
+    mostrarEstadisticas();
+}
+
+filtroDepartamento.addEventListener("change", () => {
+    campoBusqueda.value = "";
+    resultadosBusqueda.replaceChildren();
+    mostrarEstadisticas();
+});
+
+// ZOOM AUTOMATICO POR DEPARTAMENTO
+filtroDepartamento.addEventListener("change", () => {
+
+    const codigo = filtroDepartamento.value;
+
+    if (municipioResaltado) {
+        mapa.removeLayer(municipioResaltado);
+        municipioResaltado = null;
+    }
+
+    if (!codigo) {
+        mapa.setView([4.5, -74.5], 6);
+        return;
+    }
+
+    const seleccion = municipiosBusqueda.filter(feature =>
+        codigoDepartamento(feature.properties || {}) === codigo
+    );
+
+    if (seleccion.length === 0) {
+        return;
+    }
+
+    const limites = L.geoJSON({
+        type: "FeatureCollection",
+        features: seleccion
+    }).getBounds();
+
+    if (limites.isValid()) {
+        mapa.fitBounds(limites, {
+            padding: [30, 30],
+            maxZoom: 10
+        });
+    }
+});
+
+
+// LIMPIAR FICHA AL CAMBIAR DE DEPARTAMENTO
+filtroDepartamento.addEventListener("change", () => {
+    fichaTerritorial.replaceChildren();
+
+    const titulo = document.createElement("h3");
+    titulo.textContent = "Información municipal";
+
+    const mensaje = document.createElement("p");
+    mensaje.textContent =
+        "Selecciona un municipio del departamento para consultar sus datos.";
+
+    fichaTerritorial.append(titulo, mensaje);
+});

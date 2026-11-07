@@ -173,3 +173,47 @@ main {
         min-height: 450px;
     }
 }
+
+/* AJUSTES DEL SELECTOR Y ESTADISTICAS */
+
+#filtro-departamento {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 11px;
+    margin-bottom: 18px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #17365d;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+#estadisticas-territoriales {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    border-radius: 9px;
+    background: #edf6f8;
+    border: 1px solid #d0e7eb;
+    overflow-wrap: anywhere;
+}
+
+#estadisticas-territoriales h3 {
+    margin: 0 0 12px;
+    font-size: 15px;
+    color: #17365d;
+}
+
+#estadisticas-territoriales p {
+    margin: 8px 0;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+#panel-territorial {
+    overflow-x: hidden;
+}
+
