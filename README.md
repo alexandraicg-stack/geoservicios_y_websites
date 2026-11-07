@@ -11,3 +11,6 @@ Herramientas:
 - PostGIS
 - GeoServer
 - Leaflet
+
+## Verificacion Git
+Rama de prueba creada desde VS Code para el Modulo 0.
