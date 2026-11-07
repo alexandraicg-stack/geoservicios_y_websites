@@ -8,3 +8,5 @@ web.xml.respaldo
 *.gpkg-wal
 __pycache__/
 *.pyc
+visor/index.respaldo.html
+visor/js/app.respaldo.js

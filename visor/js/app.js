@@ -157,3 +157,141 @@ mapa.on("click", async function (evento) {
         popup.setContent("No fue posible consultar el municipio.");
     }
 });
+
+// BUSCADOR TERRITORIAL DE COLOMBIA
+
+const campoBusqueda = document.getElementById("buscar-municipio");
+const resultadosBusqueda = document.getElementById("resultados-busqueda");
+const fichaTerritorial = document.getElementById("ficha-territorial");
+
+let municipiosBusqueda = [];
+let municipioResaltado = null;
+
+function normalizarTexto(valor) {
+    return String(valor || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+}
+
+function mostrarFichaMunicipal(info) {
+    fichaTerritorial.replaceChildren();
+
+    const titulo = document.createElement("h3");
+    titulo.textContent = info.mpio_nombre || "Municipio";
+
+    fichaTerritorial.appendChild(titulo);
+
+    const campos = [
+        ["Departamento", info.dpto_nombre],
+        ["Código DIVIPOLA", info.divipola_mun],
+        [
+            "Área registrada",
+            info.area_km2 != null
+                ? Number(info.area_km2).toLocaleString("es-CO", {
+                    maximumFractionDigits: 2
+                }) + " km²"
+                : "Sin dato"
+        ]
+    ];
+
+    campos.forEach(([etiqueta, valor]) => {
+        const parrafo = document.createElement("p");
+        const negrita = document.createElement("strong");
+
+        negrita.textContent = etiqueta + ": ";
+        parrafo.append(negrita, document.createTextNode(valor ?? "Sin dato"));
+
+        fichaTerritorial.appendChild(parrafo);
+    });
+}
+
+function seleccionarMunicipio(feature) {
+    if (municipioResaltado) {
+        mapa.removeLayer(municipioResaltado);
+    }
+
+    municipioResaltado = L.geoJSON(feature, {
+        style: {
+            color: "#e87920",
+            weight: 3,
+            fillColor: "#f59e0b",
+            fillOpacity: 0.22
+        }
+    }).addTo(mapa);
+
+    mapa.fitBounds(municipioResaltado.getBounds(), {
+        padding: [35, 35],
+        maxZoom: 11
+    });
+
+    mostrarFichaMunicipal(feature.properties);
+    resultadosBusqueda.replaceChildren();
+
+    campoBusqueda.value = feature.properties.mpio_nombre || "";
+}
+
+function buscarMunicipios() {
+    resultadosBusqueda.replaceChildren();
+
+    const texto = normalizarTexto(campoBusqueda.value);
+
+    if (texto.length < 2) {
+        return;
+    }
+
+    const encontrados = municipiosBusqueda
+        .filter(feature =>
+            normalizarTexto(feature.properties?.mpio_nombre).includes(texto)
+        )
+        .slice(0, 12);
+
+    if (encontrados.length === 0) {
+        resultadosBusqueda.textContent = "No se encontraron municipios.";
+        return;
+    }
+
+    encontrados.forEach(feature => {
+        const info = feature.properties;
+
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.className = "resultado-municipio";
+
+        boton.textContent =
+            (info.mpio_nombre || "Municipio") +
+            " — " +
+            (info.dpto_nombre || "Departamento");
+
+        boton.addEventListener("click", () => {
+            seleccionarMunicipio(feature);
+        });
+
+        resultadosBusqueda.appendChild(boton);
+    });
+}
+
+campoBusqueda.addEventListener("input", buscarMunicipios);
+
+fetch("../data/municipios_colombia.geojson")
+    .then(respuesta => {
+        if (!respuesta.ok) {
+            throw new Error("No se pudo cargar el GeoJSON municipal.");
+        }
+        return respuesta.json();
+    })
+    .then(datos => {
+        municipiosBusqueda = datos.features || [];
+
+        console.log(
+            "Municipios disponibles para búsqueda:",
+            municipiosBusqueda.length
+        );
+    })
+    .catch(error => {
+        console.error("Error cargando municipios:", error);
+        resultadosBusqueda.textContent =
+            "No fue posible cargar el buscador municipal.";
+    });
+

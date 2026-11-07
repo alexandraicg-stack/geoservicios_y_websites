@@ -67,3 +67,109 @@ main {
         padding: 6px;
     }
 }
+
+/* PANEL LATERAL DEL VISOR TERRITORIAL */
+
+.visor-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    min-height: 0;
+}
+
+#panel-territorial {
+    width: 320px;
+    min-width: 320px;
+    background: #ffffff;
+    border: 1px solid #d8e2ed;
+    border-radius: 10px;
+    padding: 22px;
+    overflow-y: auto;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+#panel-territorial h2 {
+    margin: 0 0 8px;
+    color: #17365d;
+    font-size: 21px;
+}
+
+#panel-territorial > p {
+    margin: 0 0 24px;
+    color: #63758a;
+    font-size: 13px;
+}
+
+#panel-territorial label {
+    display: block;
+    margin-bottom: 8px;
+    color: #243b53;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+#buscar-municipio {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+#buscar-municipio:focus {
+    border-color: #19a7a0;
+    box-shadow: 0 0 0 3px rgba(25, 167, 160, 0.12);
+}
+
+#resultados-busqueda {
+    margin-top: 10px;
+    max-height: 230px;
+    overflow-y: auto;
+}
+
+#ficha-territorial {
+    margin-top: 24px;
+    padding: 16px;
+    background: #f3f7fb;
+    border: 1px solid #dce6ef;
+    border-radius: 9px;
+}
+
+#ficha-territorial h3 {
+    margin: 0 0 12px;
+    color: #17365d;
+    font-size: 16px;
+}
+
+#ficha-territorial p {
+    color: #526477;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.visor-layout #map {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+    min-height: 400px;
+}
+
+/* ADAPTACION PARA PANTALLAS PEQUEÑAS */
+
+@media (max-width: 800px) {
+    .visor-layout {
+        flex-direction: column;
+    }
+
+    #panel-territorial {
+        width: 100%;
+        min-width: 0;
+        max-height: 300px;
+    }
+
+    .visor-layout #map {
+        min-height: 450px;
+    }
+}

@@ -19,8 +19,35 @@
         <p>Departamentos y municipios | Servicios SIG</p>
     </header>
 
-    <main>
+    <main class="visor-layout">
+
+        <aside id="panel-territorial">
+
+            <h2>Consulta territorial</h2>
+            <p>Explora los municipios de Colombia</p>
+
+            <label for="buscar-municipio">
+                Buscar municipio
+            </label>
+
+            <input
+                type="search"
+                id="buscar-municipio"
+                placeholder="Ej. Anapoima, Medellín..."
+                autocomplete="off"
+            >
+
+            <div id="resultados-busqueda"></div>
+
+            <section id="ficha-territorial">
+                <h3>Información municipal</h3>
+                <p>Selecciona un municipio para consultar sus datos.</p>
+            </section>
+
+        </aside>
+
         <div id="map"></div>
+
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -28,3 +55,4 @@
 
 </body>
 </html>
+
