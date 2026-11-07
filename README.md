@@ -1,89 +1,121 @@
-﻿# GeoServicios y Websites
+# GeoServicios y Websites
 
-Modulo 0 - Nivelacion SIG
+**Infraestructura de servicios geoespaciales y desarrollo de un visor territorial interactivo para Colombia**
 
-Autora: Jenifer Alexandra Huertas Lopez
+**Autora:** Jenifer Alexandra Huertas López  
+**Actualización documental:** 7 de noviembre de 2026  
+**Proyecto académico:** prácticas de servicios SIG y Capítulo 11 — Aplicación Web con Leaflet.
 
-Herramientas:
-- Git y GitHub
-- Visual Studio Code
-- Docker
-- PostGIS
-- GeoServer
-- Leaflet
+[![Abrir visor](https://img.shields.io/badge/Abrir-Visor%20Territorial-2d7d68?style=for-the-badge)](https://alexandraicg-stack.github.io/geoservicios_y_websites/visor/) [![Documentación técnica](https://img.shields.io/badge/Leer-Documentaci%C3%B3n%20del%20visor-486ca9?style=for-the-badge)](visor/README.md)
 
-## Verificacion Git
-Rama de prueba creada desde VS Code para el Modulo 0.
+## Presentación
 
+Este repositorio reúne las prácticas de configuración de servicios geoespaciales y la implementación progresiva del **Visor Territorial de Colombia**. Integra un entorno SIG local, desarrollado con Docker, PostgreSQL/PostGIS, GeoServer y pg_tileserv, y una aplicación cartográfica web construida con Leaflet, HTML, CSS y JavaScript, publicada en GitHub Pages.
 
-## Evidencias de funcionamiento
+La aplicación pública permite consultar información territorial departamental y municipal de Colombia e incorpora una capa temática de **bibliotecas de Santiago de Cali** consumida desde servicios **WMS y WFS** de la Infraestructura de Datos Espaciales de Santiago de Cali (IDESC).
 
-Las capturas documentan el funcionamiento local comprobado durante el desarrollo. Las imágenes muestran la configuración y la visualización observadas; no sustituyen pruebas de despliegue reproducible ni de validación topológica exhaustiva.
+> **Distinción esencial:** en GitHub Pages, las capas de departamentos y municipios se leen desde archivos GeoJSON. Los servicios WMS/WFS de esas capas corresponden al **entorno local**, mientras que el WMS/WFS público integrado en el visor corresponde a **bibliotecas de Cali**. GitHub Pages no aloja GeoServer ni PostGIS.
 
-### 01. Contenedores Docker de PostGIS, GeoServer y pg_tileserv
+## Accesos rápidos
 
-![Contenedores Docker de PostGIS, GeoServer y pg_tileserv](evidencias/01_docker_servicios.png)
+| Recurso | Enlace |
+|---|---|
+| Visor público | [Abrir Visor Territorial de Colombia](https://alexandraicg-stack.github.io/geoservicios_y_websites/visor/) |
+| Documentación técnica completa | [README del visor](visor/README.md) |
+| Código de entrada | [`visor/index.html`](visor/index.html) |
+| Evidencias históricas | [Carpeta `evidencias/`](evidencias/) |
+| Repositorio | [geoservicios_y_websites](https://github.com/alexandraicg-stack/geoservicios_y_websites) |
 
-### 02. Tabla de atributos de QGIS con 1.122 municipios
+## Funcionalidades del visor público
 
-![Tabla de atributos de QGIS con 1.122 municipios](evidencias/02_qgis_1122_municipios.png)
+- Visualización de límites **departamentales y municipales** sobre OpenStreetMap.
+- Activación y desactivación de capas desde el control cartográfico.
+- Búsqueda de municipios por nombre y filtro por departamento.
+- Consulta de atributos y ficha territorial mediante ventanas emergentes y panel lateral.
+- Leyenda cartográfica y estadísticas de cobertura de los datos cargados.
+- Interfaz adaptable con menú de consultas en pantallas móviles.
+- Incorporación de bibliotecas de Cali con **WMS** para visualización y **WFS** para consulta de geometrías y atributos.
 
-### 03. Catálogo de capas publicado por pg_tileserv
+### Datos observados durante las pruebas
 
-![Catálogo de capas publicado por pg_tileserv](evidencias/03_pg_tileserv_catalogo.png)
+| Conjunto | Resultado registrado |
+|---|---:|
+| Municipios disponibles para búsqueda | 1.122 registros |
+| Entidades de la capa departamental | 33 |
+| Bibliotecas de Cali consultadas por WFS | 63 entidades |
 
-### 04. Vista previa de teselas vectoriales municipales
+Los conteos son resultados del ejercicio y de las pruebas registradas el **7 de noviembre de 2026**; no deben interpretarse como inventarios oficiales vigentes ni como disponibilidad garantizada del servicio externo.
 
-![Vista previa de teselas vectoriales municipales](evidencias/04_pg_tileserv_municipios.png)
+## Arquitectura técnica
 
-### 05. Servicio WMS de municipios en GeoServer
+| Componente | Entorno local de prácticas | Aplicación pública |
+|---|---|---|
+| PostgreSQL / PostGIS | Almacenamiento espacial y consultas | No alojado en GitHub Pages |
+| GeoServer | Publicación y prueba de WMS/WFS de capas territoriales | Consumo de GeoServer externo de IDESC Cali |
+| pg_tileserv | Publicación y exploración de teselas vectoriales | No es requisito para abrir el visor público |
+| Leaflet | Desarrollo y pruebas | Renderizado y controles interactivos |
+| Departamentos y municipios | Capas SIG locales | Archivos GeoJSON del repositorio |
+| Bibliotecas de Cali | Integración y pruebas de servicios OGC | WMS/WFS institucional por HTTPS |
+| GitHub Pages | — | Alojamiento estático de la aplicación |
 
-![Servicio WMS de municipios en GeoServer](evidencias/05_geoserver_wms_municipios.png)
+La capa institucional utilizada es `cultura:pbic_inc_bibliotecas`, publicada por IDESC Cali mediante:
 
-### 06. Servicio WMS de departamentos en GeoServer
+- WMS: `https://ws-idesc.cali.gov.co/geoserver/wms`
+- WFS: `https://ws-idesc.cali.gov.co/geoserver/wfs`
 
-![Servicio WMS de departamentos en GeoServer](evidencias/06_geoserver_wms_departamentos.png)
+El WMS representa la información y el WFS permite recuperar entidades y atributos. La consulta WFS registrada devolvió 63 entidades; esa cantidad puede variar con las actualizaciones institucionales.
 
-### 07. Visor Leaflet con límites departamentales
+## Estructura principal
 
-![Visor Leaflet con límites departamentales](evidencias/07_leaflet_vista_nacional.png)
+```text
+geoservicios_y_websites/
+├── README.md                         # Presentación general del proyecto
+├── data/
+│   ├── departamentos.geojson
+│   └── municipios_colombia.geojson
+├── visor/
+│   ├── index.html                    # Aplicación pública
+│   ├── README.md                     # Documentación técnica detallada
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       ├── app.js
+│       └── bibliotecas-cali.js
+└── evidencias/                       # Capturas históricas del desarrollo
+```
 
-### 08. Visor Leaflet con municipios y departamentos activados
+Esta vista presenta las rutas relevantes documentadas; no pretende ser un inventario exhaustivo del repositorio.
 
-![Visor Leaflet con municipios y departamentos activados](evidencias/08_leaflet_capas_municipales.png)
+## Cómo utilizar el visor
 
-### 09. Respuesta GetFeatureInfo HTML mostrando Yolombó
+1. Abre el [visor público](https://alexandraicg-stack.github.io/geoservicios_y_websites/visor/).
+2. Utiliza el control de capas para mostrar **Departamentos**, **Municipios** y **Bibliotecas de Cali**.
+3. Busca un municipio o filtra por departamento.
+4. Selecciona un municipio para revisar su información territorial.
+5. Acércate a Cali y selecciona una biblioteca para consultar sus atributos.
+6. En dispositivos móviles, utiliza el menú de consultas para acceder al panel.
 
-![Respuesta GetFeatureInfo HTML mostrando Yolombó](evidencias/09_geoserver_getfeatureinfo.png)
+**No necesitas ejecutar Docker para abrir el visor público.** La capa de bibliotecas requiere conexión y disponibilidad del servicio externo de IDESC.
 
-### 10. Ficha interactiva de Anapoima desde GeoServer
+## Desarrollo y evidencias
 
-![Ficha interactiva de Anapoima desde GeoServer](evidencias/10_leaflet_consulta_anapoima.png)
+El proyecto registra una evolución desde la nivelación con Git y Visual Studio Code hasta la configuración de contenedores, publicación local de datos y construcción del visor web.
 
+Las imágenes conservadas en [`evidencias/`](evidencias/) documentan fases previas, entre ellas: contenedores Docker, revisión de 1.122 municipios en QGIS, catálogo de pg_tileserv, capas WMS de GeoServer, consultas GetFeatureInfo, filtros y búsquedas del visor en versiones anteriores. **Estas capturas son evidencia histórica y no deben confundirse con pruebas actuales de todos los componentes.**
 
+Las comprobaciones finales descritas en la [documentación técnica del visor](visor/README.md) incluyen consulta WFS de bibliotecas, visualización WMS, respuestas del servidor, interacción con las capas nacionales y adaptación móvil. El README técnico distingue las pruebas observadas de las limitaciones de evidencia.
 
-## Evidencias adicionales — versiones 2 y 3
+## Alcance y precauciones
 
-Capturas obtenidas durante la construcción y comprobación del visor; documentan resultados observados en el navegador.
+- La versión pública es un sitio estático: no despliega servicios backend propios.
+- Los GeoJSON nacionales utilizados deben acompañarse de su fuente original y condiciones de reutilización antes de presentarse como un inventario oficial definitivo.
+- Los valores y geometrías del visor son orientativos para el ejercicio académico; no constituyen certificación catastral.
+- Los servicios de IDESC pueden modificarse o estar temporalmente indisponibles.
+- Los resultados de pruebas locales no garantizan que servicios locales estén disponibles públicamente.
 
-### Versión 2 — estilos transparentes y límites departamentales
-![Versión 2 — estilos transparentes y límites departamentales](evidencias/11_v2_estilos_transparentes.png)
+## Créditos
 
-### Versión 2 — búsqueda y selección de Bogotá, D. C.
-![Versión 2 — búsqueda y selección de Bogotá, D. C.](evidencias/12_v2_busqueda_bogota.png)
-
-### Versión 3 — panel con estadísticas nacionales y selector departamental
-![Versión 3 — panel con estadísticas nacionales y selector departamental](evidencias/13_v3_cobertura_nacional.png)
-
-### Versión 3 — filtro Boyacá, 123 registros y selección de Chíquiza
-![Versión 3 — filtro Boyacá, 123 registros y selección de Chíquiza](evidencias/14_v3_boyaca_chiquiza.png)
-
-### Versión 3 — filtro Cundinamarca y selección de Funza
-![Versión 3 — filtro Cundinamarca y selección de Funza](evidencias/15_v3_cundinamarca_funza.png)
-
-### Versión 3 — acercamiento automático al departamento de Boyacá
-![Versión 3 — acercamiento automático al departamento de Boyacá](evidencias/16_v3_zoom_departamental_boyaca.png)
-
-### Versión 3 — vista nacional final y panel de consulta
-![Versión 3 — vista nacional final y panel de consulta](evidencias/17_v3_vista_nacional_final.png)
-
+**Desarrollo y documentación:** Jenifer Alexandra Huertas López.  
+**Mapa base:** © colaboradores de OpenStreetMap.  
+**Bibliotecas de Cali:** Infraestructura de Datos Espaciales de Santiago de Cali (IDESC), Alcaldía de Santiago de Cali.  
+**Documentación complementaria:** [Visor Territorial de Colombia](visor/README.md).
