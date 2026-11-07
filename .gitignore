@@ -10,3 +10,14 @@ __pycache__/
 *.pyc
 visor/index.respaldo.html
 visor/js/app.respaldo.js
+RESPALDO_GEOSERVER/
+geoserver_data/
+
+# Configuracion experimental de Docker
+docker-compose.persistente.yml
+
+# Respaldos del visor responsive
+visor/index.respaldo-responsive.html
+visor/css/style.respaldo-responsive.css
+visor/js/app.respaldo-responsive.js
+

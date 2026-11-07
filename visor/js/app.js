@@ -207,7 +207,27 @@ function mostrarFichaMunicipal(info) {
     });
 }
 
-function seleccionarMunicipio(feature) {
+async function seleccionarMunicipio(feature) {
+
+    // CONSULTAR MUNICIPIO SELECCIONADO MEDIANTE WFS
+    try {
+        const codigo = feature.properties.divipola_mun;
+
+        const featureWFS = await consultarMunicipioWFS(codigo);
+
+        feature = featureWFS;
+
+        console.log(
+            "Municipio recuperado desde WFS:",
+            feature.properties.mpio_nombre
+        );
+
+    } catch (error) {
+        console.warn(
+            "WFS no disponible. Se utiliza el GeoJSON local.",
+            error
+        );
+    }
     if (municipioResaltado) {
         mapa.removeLayer(municipioResaltado);
     }
@@ -417,3 +437,102 @@ filtroDepartamento.addEventListener("change", () => {
 
     fichaTerritorial.append(titulo, mensaje);
 });
+
+// CONSULTA WFS MUNICIPAL V4
+async function consultarMunicipioWFS(codigoDivipola) {
+
+    const parametros = new URLSearchParams({
+        service: "WFS",
+        version: "2.0.0",
+        request: "GetFeature",
+        typeNames: "colombia_sig:Municipios",
+        outputFormat: "application/json",
+        count: "1",
+        CQL_FILTER: "divipola_mun='" +
+            String(codigoDivipola).replace(/'/g, "''") + "'"
+    });
+
+    const url = "http://localhost:8082/geoserver/colombia_sig/ows?"
+        + parametros.toString();
+
+    const respuesta = await fetch(url);
+
+    if (!respuesta.ok) {
+        throw new Error("Error WFS: HTTP " + respuesta.status);
+    }
+
+    const datos = await respuesta.json();
+
+    if (!datos.features || datos.features.length === 0) {
+        throw new Error("Municipio no encontrado mediante WFS.");
+    }
+
+    return datos.features[0];
+}
+
+
+// LEYENDA CARTOGRAFICA V4
+const leyendaCartografica = L.control({
+    position: "bottomright"
+});
+
+leyendaCartografica.onAdd = function () {
+    const div = L.DomUtil.create("div", "leyenda-territorial");
+
+    div.style.cssText = `
+        background: rgba(255,255,255,0.96);
+        padding: 12px 15px;
+        border: 1px solid #d7e1ea;
+        border-radius: 9px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        line-height: 1.9;
+        color: #18365d;
+    `;
+
+    div.innerHTML = `
+        <div style="font-weight:bold;font-size:13px;margin-bottom:5px">
+            Convenciones
+        </div>
+        <div>
+            <span style="display:inline-block;width:24px;border-top:3px solid #e87920;vertical-align:middle;margin-right:8px"></span>
+            Municipio seleccionado
+        </div>
+        <div>
+            <span style="display:inline-block;width:24px;border-top:2px solid #214f81;vertical-align:middle;margin-right:8px"></span>
+            Límites departamentales
+        </div>
+        <div>
+            <span style="display:inline-block;width:24px;border-top:1px dashed #7597b5;vertical-align:middle;margin-right:8px"></span>
+            Límites municipales
+        </div>
+    `;
+
+    L.DomEvent.disableClickPropagation(div);
+
+    return div;
+};
+
+leyendaCartografica.addTo(mapa);
+
+// MENU HAMBURGUESA RESPONSIVE V4
+const botonMenu = document.getElementById("boton-menu");
+const panelTerritorial = document.getElementById("panel-territorial");
+
+if (botonMenu && panelTerritorial) {
+    botonMenu.addEventListener("click", function () {
+        const abierto = panelTerritorial.classList.toggle("panel-abierto");
+
+        botonMenu.setAttribute("aria-expanded", String(abierto));
+        botonMenu.textContent = abierto
+            ? "\u2715 Cerrar consultas"
+            : "\u2630 Consultas";
+
+        if (typeof mapa !== "undefined") {
+            setTimeout(function () {
+                mapa.invalidateSize();
+            }, 150);
+        }
+    });
+}
