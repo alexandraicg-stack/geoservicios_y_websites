@@ -1,0 +1,37 @@
+﻿services:
+  postgis:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: geodatos
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d geodatos"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  geoserver:
+    image: docker.osgeo.org/geoserver:2.25.3
+    ports:
+      - "127.0.0.1:8082:8080"
+    depends_on:
+      postgis:
+        condition: service_healthy
+
+  pg_tileserv:
+    image: pramsey/pg_tileserv:latest
+    environment:
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgis:5432/geodatos
+    ports:
+      - "127.0.0.1:7800:7800"
+    depends_on:
+      postgis:
+        condition: service_healthy
+
+volumes:
+  pgdata:

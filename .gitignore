@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+web.xml.cors
+web.xml.respaldo
+*.gpkg
+*.gpkg-shm
+*.gpkg-wal
+__pycache__/
+*.pyc
